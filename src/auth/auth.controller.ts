@@ -23,6 +23,14 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Get('getMe')
     async getMe(@Request() req) {
-        return req.user
+        const user = await this.authService.setOnline(req.user.id)
+        return user
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('offline')
+    async offline(@Request() req) {
+        const user = await this.authService.setOffline(req.user.id)
+        return user
     }
 }

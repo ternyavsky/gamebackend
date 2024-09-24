@@ -20,6 +20,9 @@ export class User extends CommonEntity {
     @Column({ nullable: true })
     public tgLink: string;
 
+    @Column({ default: false })
+    public online: boolean
+
     @Column({ nullable: true })
     public email: string;
 

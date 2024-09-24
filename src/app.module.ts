@@ -25,6 +25,7 @@ import { TinkoffModule } from './tinkoff/tinkoff.module';
 import { PusherModule } from 'nestjs-pusher';
 import { AuthModule } from './auth/auth.module';
 import { PaymentsModule } from './payments/payments.module';
+import { StatsModule } from './stats/stats.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -68,6 +69,7 @@ import { PaymentsModule } from './payments/payments.module';
         TinkoffModule,
         AuthModule,
         PaymentsModule,
+        StatsModule,
     ],
     controllers: [AppController],
     providers: [AppService],

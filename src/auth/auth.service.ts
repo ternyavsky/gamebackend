@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ForgotPasswordDTO } from './dto/forgotPassword.dto';
 import { MinioService } from 'src/config/s3/minio.service';
 import { UsersService } from 'src/users/users.service';
+import { PusherService } from 'nestjs-pusher';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
         private readonly minioService: MinioService,
         @Inject()
         private readonly usersService: UsersService,
+        private readonly pusherService: PusherService
     ) { }
 
     async registration(authDto: AuthDTO) {
@@ -29,11 +31,26 @@ export class AuthService {
 
             const user = this.usersRepository.create(authDto);
             user.password = await bcrypt.hash(authDto.password, 10)
+            this.pusherService.trigger('stats', 'newUser', 'newUser')
             return await this.usersRepository.save(user)
         } else {
             throw new BadRequestException('User already have account')
         }
 
+    }
+
+    async setOffline(userId: string) {
+        const user = await this.usersRepository.findOneBy({ id: userId })
+        user.online = false
+        this.pusherService.trigger('stats', 'onlineDecrease', 'onlineDecrease')
+        return await this.usersRepository.save(user)
+    }
+
+    async setOnline(userId: string) {
+        const user = await this.usersRepository.findOneBy({ id: userId })
+        user.online = true
+        this.pusherService.trigger('stats', 'onlineIncrease', 'onlineIncrease')
+        return await this.usersRepository.save(user)
     }
 
 
