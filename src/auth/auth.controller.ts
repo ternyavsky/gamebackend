@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDTO, SignInDTO } from './dto/registration.dto';
 import { ForgotPasswordDTO } from './dto/forgotPassword.dto';
@@ -16,9 +16,9 @@ export class AuthController {
     async singIn(@Body() singInDto: SignInDTO) {
         return await this.authService.singIn(singInDto)
     }
-    @Post('vkAuth')
-    async vkCallback(@Req() req) {
-        console.log(req)
+    @Get('vkAuth')
+    async vkCallbackAuth(@Query('code') code: string, @Query('device_id') deviceId: string) {
+        console.log(code, deviceId)
     }
     @Post('forgotPassword')
     async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDTO) {
