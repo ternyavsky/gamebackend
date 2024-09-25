@@ -34,7 +34,7 @@ export class AuthService {
             if (!authDto.email) {
                 user = this.usersRepository.create({ name: authDto.name, email: authDto.name, ...authDto });
             } else {
-                user = this.usersRepository.create({ email: authDto.name, ...authDto });
+                user = this.usersRepository.create(authDto);
             }
             this.pusherService.trigger('stats', 'newUser', 'newUser')
             return await this.usersRepository.save(user)
