@@ -18,7 +18,7 @@ export class AuthController {
     }
     @Get('vkAuth')
     async vkCallbackAuth(@Query('code') code: string, @Query('device_id') deviceId: string) {
-        console.log(code, deviceId)
+        return { code, deviceId }
     }
     @Post('forgotPassword')
     async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDTO) {
