@@ -6,35 +6,36 @@ import { Item } from './dto/item.dto';
 
 @Injectable()
 export class TinkoffService {
-	constructor() {}
-	testUrl = process.env.TINKOFF_TEST_URL;
-	prodUrl = process.env.TINKOFF_API_URL;
+    constructor() { }
+    testUrl = process.env.TINKOFF_TEST_URL;
+    prodUrl = process.env.TINKOFF_API_URL;
 
-	async generateUrl(payment: Payment) {}
+    async generateUrl(payment: Payment) { }
 
-	async generateTestUrl(payment: Payment) {
-		this.setSuccessUrl(payment);
-		this.setFailUrL(payment);
-		this.setEnvParams(payment);
+    async generateTestUrl(payment: Payment) {
+        this.setSuccessUrl(payment);
+        this.setFailUrL(payment);
+        this.setEnvParams(payment);
 
-		payment['DATA'] = {
-			Phone: '+79086007430',
-			Email: 'reci@mail.com',
-		};
-		const res = await axios.post(`${this.prodUrl}/v2/Init`, payment);
-		return res.data;
-	}
+        payment['DATA'] = {
+            Phone: '+79086007430',
+            Email: 'reci@mail.com',
+        };
+        payment['NotificationURL'] = "http://localhost:8000/api/tinkoff/callback"
+        const res = await axios.post(`${this.prodUrl}/v2/Init`, payment);
+        return res.data;
+    }
 
-	async setSuccessUrl(payment: Payment) {
-		payment['SuccessURL'] = 'some/';
-	}
+    async setSuccessUrl(payment: Payment) {
+        payment['SuccessURL'] = 'http/';
+    }
 
-	async setEnvParams(payment: Payment) {
-		payment['TerminalKey'] = process.env.TINKOFF_TERMINAL;
-		payment['Token'] = process.env.TINKOFF_SECRET_KEY;
-	}
+    async setEnvParams(payment: Payment) {
+        payment['TerminalKey'] = process.env.TINKOFF_TERMINAL;
+        payment['Token'] = process.env.TINKOFF_SECRET_KEY;
+    }
 
-	async setFailUrL(payment: Payment) {
-		payment['FailURL'] = 'some/';
-	}
+    async setFailUrL(payment: Payment) {
+        payment['FailURL'] = 'some/';
+    }
 }

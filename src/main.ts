@@ -8,7 +8,7 @@ import { useContainer } from 'class-validator';
 async function bootstrap() {
     initializeTransactionalContext();
     const app = await NestFactory.create(AppModule);
-    app.enableCors();
+    app.enableCors({ origin: true, credentials: true });
     app.useGlobalPipes(new ValidationPipe());
     app.enableVersioning({
         type: VersioningType.URI,
