@@ -30,11 +30,14 @@ export class AuthService {
         const checkUser = await this.usersRepository.findOne({ where: { name: authDto.name, email: authDto.email } })
         console.log(checkUser)
         if (!checkUser) {
+            let user = null
             if (!authDto.email) {
-                const user = this.usersRepository.create({ name: authDto.name, email: authDto.name, ...authDto });
-                this.pusherService.trigger('stats', 'newUser', 'newUser')
-                return await this.usersRepository.save(user)
+                user = this.usersRepository.create({ name: authDto.name, email: authDto.name, ...authDto });
+            } else {
+                user = this.usersRepository.create({ email: authDto.name, ...authDto });
             }
+            this.pusherService.trigger('stats', 'newUser', 'newUser')
+            return await this.usersRepository.save(user)
         }
         if (checkUser.name == checkUser.email) {
             return checkUser
