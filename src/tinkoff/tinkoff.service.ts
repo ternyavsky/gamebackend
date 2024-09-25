@@ -3,6 +3,7 @@ import { Payment } from './dto/payment.dto';
 import bcrypt from 'src/config/bcrypt';
 import axios from 'axios';
 import { Item } from './dto/item.dto';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class TinkoffService {
@@ -16,18 +17,16 @@ export class TinkoffService {
         this.setSuccessUrl(payment);
         this.setFailUrL(payment);
         this.setEnvParams(payment);
+        payment['Description'] = "Пополнение счета"
+        payment['OrderId'] = randomInt(50000).toString()
 
-        payment['DATA'] = {
-            Phone: '+79086007430',
-            Email: 'reci@mail.com',
-        };
-        payment['NotificationURL'] = "http://localhost:8000/api/tinkoff/callback"
+        // payment['NotificationURL'] = "http://localhost:8000/api/tinkoff/callback"
         const res = await axios.post(`${this.prodUrl}/v2/Init`, payment);
-        return res.data;
+        return res.data.PaymentURL;
     }
 
     async setSuccessUrl(payment: Payment) {
-        payment['SuccessURL'] = 'http/';
+        payment['SuccessURL'] = 'https://teamproject.site/success';
     }
 
     async setEnvParams(payment: Payment) {
@@ -36,6 +35,6 @@ export class TinkoffService {
     }
 
     async setFailUrL(payment: Payment) {
-        payment['FailURL'] = 'some/';
+        payment['FailURL'] = 'https://teamproject.site/fail';
     }
 }
