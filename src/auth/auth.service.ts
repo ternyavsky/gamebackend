@@ -9,6 +9,7 @@ import { ForgotPasswordDTO } from './dto/forgotPassword.dto';
 import { MinioService } from 'src/config/s3/minio.service';
 import { UsersService } from 'src/users/users.service';
 import { PusherService } from 'nestjs-pusher';
+import { MailService } from 'src/config/smtp/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -20,20 +21,25 @@ export class AuthService {
         private readonly minioService: MinioService,
         @Inject()
         private readonly usersService: UsersService,
-        private readonly pusherService: PusherService
+        private readonly pusherService: PusherService,
+        private readonly mailService: MailService
     ) { }
 
     async registration(authDto: AuthDTO) {
 
-        const checkUser = await this.usersRepository.find({ where: { name: authDto.name, email: authDto.email } })
+        const checkUser = await this.usersRepository.findOne({ where: { name: authDto.name, email: authDto.email } })
         console.log(checkUser)
-        if (checkUser.length == 0) {
-
-            const user = this.usersRepository.create(authDto);
-            user.password = await bcrypt.hash(authDto.password, 10)
-            this.pusherService.trigger('stats', 'newUser', 'newUser')
-            return await this.usersRepository.save(user)
-        } else {
+        if (!checkUser) {
+            if (!authDto.email) {
+                const user = this.usersRepository.create({ name: authDto.name, email: authDto.name });
+                this.pusherService.trigger('stats', 'newUser', 'newUser')
+                return await this.usersRepository.save(user)
+            }
+        }
+        if (checkUser.name == checkUser.email) {
+            return checkUser
+        }
+        else {
             throw new BadRequestException('User already have account')
         }
 
@@ -54,7 +60,16 @@ export class AuthService {
     }
 
 
-    async forgotPassword(forgotPasswordDto: ForgotPasswordDTO) { }
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDTO) {
+        console.log(forgotPasswordDto.email)
+        const user = await this.usersRepository.findOneBy({ email: forgotPasswordDto.email })
+        if (user) {
+            this.mailService.forgotPasswordMessage(user.email, user.password)
+            return user
+        } else {
+            throw new UnauthorizedException('No users')
+        }
+    }
 
     async singIn({ email, name, password }: SignInDTO) {
         const payload = {};
@@ -67,7 +82,7 @@ export class AuthService {
         payload['email'] = user.email
         payload['name'] = user.name
 
-        const comparePassword = await bcrypt.compare(password, user.password);
+        const comparePassword = password == user.password;
         if (!comparePassword) {
             throw new UnauthorizedException('No valid password')
         }

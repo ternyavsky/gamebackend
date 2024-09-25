@@ -7,9 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { MinioService } from 'src/config/s3/minio.service';
+import { MailModule } from 'src/config/smtp/mail.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), JwtModule.register({ global: true, secret: 'Bearer', signOptions: { expiresIn: '7d' } }), UsersModule],
+    imports: [TypeOrmModule.forFeature([User]), JwtModule.register({ global: true, secret: 'Bearer', signOptions: { expiresIn: '7d' } }), UsersModule, MailModule],
     controllers: [AuthController],
     providers: [AuthService, MinioService, UsersService],
 })

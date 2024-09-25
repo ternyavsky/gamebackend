@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDTO, SignInDTO } from './dto/registration.dto';
 import { ForgotPasswordDTO } from './dto/forgotPassword.dto';
@@ -16,8 +16,15 @@ export class AuthController {
     async singIn(@Body() singInDto: SignInDTO) {
         return await this.authService.singIn(singInDto)
     }
+    @Post('vkAuth')
+    async vkCallback(@Req() req) {
+        console.log(req)
+    }
     @Post('forgotPassword')
-    async forgotPassword(forgotPasswordDto: ForgotPasswordDTO) {
+    async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDTO) {
+        if (!forgotPasswordDto.email) {
+            throw new BadRequestException('No email')
+        }
         return await this.authService.forgotPassword(forgotPasswordDto)
     }
     @UseGuards(AuthGuard)
@@ -33,4 +40,6 @@ export class AuthController {
         const user = await this.authService.setOffline(req.user.id)
         return user
     }
+
+
 }

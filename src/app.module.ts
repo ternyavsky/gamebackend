@@ -26,6 +26,8 @@ import { PusherModule } from 'nestjs-pusher';
 import { AuthModule } from './auth/auth.module';
 import { PaymentsModule } from './payments/payments.module';
 import { StatsModule } from './stats/stats.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { SMTPConfig } from './config/smtp';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -34,6 +36,9 @@ import { StatsModule } from './stats/stats.module';
         }),
         BullModule.forRootAsync({
             useClass: BullConfig,
+        }),
+        MailerModule.forRootAsync({
+            useClass: SMTPConfig,
         }),
         PusherModule.forRoot(
             {
