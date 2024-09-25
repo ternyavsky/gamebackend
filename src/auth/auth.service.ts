@@ -31,7 +31,7 @@ export class AuthService {
         console.log(checkUser)
         if (!checkUser) {
             if (!authDto.email) {
-                const user = this.usersRepository.create({ name: authDto.name, email: authDto.name });
+                const user = this.usersRepository.create({ name: authDto.name, email: authDto.name, ...authDto });
                 this.pusherService.trigger('stats', 'newUser', 'newUser')
                 return await this.usersRepository.save(user)
             }
